@@ -8,11 +8,11 @@ Nvidia L4 (24GB) GPU (g6.xlarge)
 Optional 4 x L4 via dropdown (g6.12xlarge)
 ssh access
 
+# Chat with default LLMs
 1. Initialize ilab environment
 1. Review Configurations
 1. Review/Download models
-1. Serve the model
-1. Interact with the model
+1. Serve and Chat with the model
 
 ```sh
 # Verify iLAB version
@@ -63,6 +63,10 @@ podman login registry.redhat.io
 podman search registry.redhat.io/rhelai1/
 
 # Required models
+
+# The granite-7b-redhat-lab default in the config.yaml
+#ilab model download --repository docker://registry.redhat.io/rhelai1/granite-7b-redhat-lab --release latest
+
 # The granite-7b-starter base LLM
 #ilab model download --repository docker://registry.redhat.io/rhelai1/granite-7b-starter --release latest
 
@@ -77,14 +81,29 @@ podman search registry.redhat.io/rhelai1/
 
 # knowledge-adapter-v3 LoRA layered knowledge adapter for SDG.
 
-# Serve the default model granite-7b-redhat-lab
+# Serve the default model granite-7b-redhat-lab - you must download granite-7b-redhat-lab
 ilab model serve
 
 # Serve a different model
-#ilab model serve --model-path ~/.cache/instructlab/models/
+ilab model serve --model-path ~/.cache/instructlab/models/granite-7b-starter/
 
 # You can set up a systemd service so that the ilab model serve command runs as a running service. The systemd service runs the ilab model serve command in the background and restarts if it crashes or fails. You can configure the service to start upon system boot.
 
-# Once you serve your model, you can now chat with the model.
+# Once you serve your model, you can now chat with the model in a new terminal - default expects granite-7b-redhat-lab
 ilab model chat
+
+# Chat with a different model served
+ilab model chat --model ~/.cache/instructlab/models/granite-7b-starter
 ```
+
+## Optional: Running ilab model serve as a service 
+
+The systemd service runs the ilab model serve command in the background and restarts if it crashes or fails. [source](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.1/html/building_your_rhel_ai_environment/serving_and_chatting#creating_systemd_serving)
+
+## Optional: Creating an API key for model chatting 
+
+By default, the ilab CLI does not use authentication. If you want to expose your server to the internet, you can create a vLLM API key that connects to your server with the following procedures. [source](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.1/html/building_your_rhel_ai_environment/serving_and_chatting#creating_api_key)
+
+## Optional: Allowing chat access to a model from a secure endpoint 
+
+You can serve an inference endpoint and allow others to interact with models provided with Red Hat Enterprise Linux AI on secure connections by creating a systemd service and setting up a nginx reverse proxy that exposes a secure endpoint. This allows you to share the secure endpoint with others so they can chat with the model over a network. [source](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.1/html/building_your_rhel_ai_environment/serving_and_chatting#creating_secure_endpoint)
